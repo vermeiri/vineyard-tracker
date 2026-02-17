@@ -33,7 +33,14 @@ function setupEventListeners() {
     document.getElementById('add-row-mode').addEventListener('click', toggleRowMode);
     document.getElementById('clear-rows').addEventListener('click', clearRows);
     document.getElementById('create-task').addEventListener('click', createTask);
+    document.getElementById('ai-detect-rows').addEventListener('click', aiDetectRows);
     canvas.addEventListener('click', handleCanvasClick);
+    
+    // Load saved API key
+    const savedApiKey = localStorage.getItem('openai_api_key');
+    if (savedApiKey) {
+        document.getElementById('api-key').value = savedApiKey;
+    }
 }
 
 // Image handling
@@ -198,6 +205,122 @@ function clearRows() {
 
 function updateRowCount() {
     document.getElementById('row-count').textContent = state.rows.length;
+}
+
+// AI-powered row detection
+async function aiDetectRows() {
+    const apiKey = document.getElementById('api-key').value.trim();
+    const statusDiv = document.getElementById('ai-status');
+    
+    if (!apiKey) {
+        alert('Please enter your OpenAI API key');
+        document.getElementById('api-key').focus();
+        return;
+    }
+    
+    if (!state.image) {
+        alert('Please upload an image first');
+        return;
+    }
+    
+    // Save API key
+    localStorage.setItem('openai_api_key', apiKey);
+    
+    // Show loading status
+    statusDiv.style.display = 'block';
+    statusDiv.className = 'ai-status loading';
+    statusDiv.textContent = '🔄 Analyzing image with AI... This may take 10-30 seconds.';
+    
+    try {
+        // Call OpenAI Vision API
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKey}`
+            },
+            body: JSON.stringify({
+                model: 'gpt-4o',
+                messages: [
+                    {
+                        role: 'user',
+                        content: [
+                            {
+                                type: 'text',
+                                text: `Analyze this vineyard satellite/aerial image and identify the vine rows. For each row you detect, provide the center point coordinates.
+
+Instructions:
+1. Identify all visible vine rows in the image
+2. For each row, estimate a representative center point (x, y coordinates)
+3. Return coordinates as percentages (0-100) of the image dimensions
+4. Return your response as a JSON array in this exact format:
+[{"x": 50.0, "y": 10.5}, {"x": 50.0, "y": 20.3}, ...]
+
+Where x is the horizontal position (0=left, 100=right) and y is the vertical position (0=top, 100=bottom).
+Only return the JSON array, no other text.`
+                            },
+                            {
+                                type: 'image_url',
+                                image_url: {
+                                    url: state.image
+                                }
+                            }
+                        ]
+                    }
+                ],
+                max_tokens: 1000
+            })
+        });
+        
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error?.message || `API error: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        const content = data.choices[0].message.content.trim();
+        
+        // Extract JSON from response (handle markdown code blocks)
+        let jsonContent = content;
+        if (content.includes('```')) {
+            const match = content.match(/```(?:json)?\s*(\[[\s\S]*?\])\s*```/);
+            if (match) {
+                jsonContent = match[1];
+            }
+        }
+        
+        // Parse the coordinates
+        const detectedRows = JSON.parse(jsonContent);
+        
+        if (!Array.isArray(detectedRows) || detectedRows.length === 0) {
+            throw new Error('No rows detected in the image');
+        }
+        
+        // Convert percentage coordinates to actual pixel coordinates
+        state.rows = detectedRows.map(row => ({
+            x: (row.x / 100) * imageObj.width,
+            y: (row.y / 100) * imageObj.height
+        }));
+        
+        // Update UI
+        drawCanvas();
+        updateRowCount();
+        renderTasks();
+        saveState();
+        
+        statusDiv.className = 'ai-status success';
+        statusDiv.textContent = `✅ Success! Detected ${state.rows.length} vineyard rows.`;
+        
+        // Hide success message after 5 seconds
+        setTimeout(() => {
+            statusDiv.style.display = 'none';
+        }, 5000);
+        
+    } catch (error) {
+        console.error('AI detection error:', error);
+        statusDiv.className = 'ai-status error';
+        statusDiv.textContent = `❌ Error: ${error.message}. Please check your API key and try again.`;
+    }
 }
 
 // Task handling

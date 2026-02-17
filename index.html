@@ -34,15 +34,35 @@
             <!-- Row Marking Section -->
             <section class="card" id="rows-section" style="display:none;">
                 <h2>2. Mark Vine Rows</h2>
-                <p class="info">Click on the image to place markers for each vine row. Click existing markers to remove them.</p>
-                <div class="controls">
-                    <button class="btn btn-primary" id="add-row-mode">
-                        ➕ Add Row Markers
-                    </button>
-                    <button class="btn btn-secondary" id="clear-rows">
-                        🗑️ Clear All Rows
-                    </button>
-                    <span class="row-count">Rows marked: <strong id="row-count">0</strong></span>
+                <p class="info">Use AI to automatically detect rows, or click on the image to manually place markers. Click existing markers to remove them.</p>
+                
+                <!-- AI Detection Section -->
+                <div class="ai-section">
+                    <h3>🤖 AI-Powered Detection</h3>
+                    <div class="ai-controls">
+                        <input type="password" id="api-key" placeholder="Enter OpenAI API Key (stored locally)">
+                        <button class="btn btn-primary" id="ai-detect-rows">
+                            ✨ Auto-Detect Rows with AI
+                        </button>
+                    </div>
+                    <p class="info-small">Get your API key from <a href="https://platform.openai.com/api-keys" target="_blank">OpenAI</a>. Your key is stored securely in your browser.</p>
+                    <div id="ai-status" class="ai-status" style="display:none;"></div>
+                </div>
+                
+                <div class="divider">OR</div>
+                
+                <!-- Manual Detection Section -->
+                <div class="manual-section">
+                    <h3>✋ Manual Marking</h3>
+                    <div class="controls">
+                        <button class="btn btn-primary" id="add-row-mode">
+                            ➕ Add Row Markers
+                        </button>
+                        <button class="btn btn-secondary" id="clear-rows">
+                            🗑️ Clear All Rows
+                        </button>
+                        <span class="row-count">Rows marked: <strong id="row-count">0</strong></span>
+                    </div>
                 </div>
             </section>
 
