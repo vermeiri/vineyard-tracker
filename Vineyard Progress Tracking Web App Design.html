@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vineyard Progress Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🍇 Vineyard Progress Tracker</h1>
+            <p class="subtitle">Track your vineyard work progress with ease</p>
+        </header>
+
+        <main>
+            <!-- Image Upload Section -->
+            <section class="card" id="image-section">
+                <h2>1. Vineyard Image</h2>
+                <div class="upload-area">
+                    <input type="file" id="image-upload" accept="image/*" hidden>
+                    <button class="btn btn-primary" onclick="document.getElementById('image-upload').click()">
+                        📁 Upload Satellite Image
+                    </button>
+                    <button class="btn btn-secondary" id="clear-image" style="display:none;">
+                        🗑️ Clear Image
+                    </button>
+                </div>
+                <div id="canvas-container" style="display:none;">
+                    <canvas id="vineyard-canvas"></canvas>
+                </div>
+            </section>
+
+            <!-- Row Marking Section -->
+            <section class="card" id="rows-section" style="display:none;">
+                <h2>2. Mark Vine Rows</h2>
+                <p class="info">Click on the image to place markers for each vine row. Click existing markers to remove them.</p>
+                <div class="controls">
+                    <button class="btn btn-primary" id="add-row-mode">
+                        ➕ Add Row Markers
+                    </button>
+                    <button class="btn btn-secondary" id="clear-rows">
+                        🗑️ Clear All Rows
+                    </button>
+                    <span class="row-count">Rows marked: <strong id="row-count">0</strong></span>
+                </div>
+            </section>
+
+            <!-- Tasks Section -->
+            <section class="card" id="tasks-section" style="display:none;">
+                <h2>3. Progress Tasks</h2>
+                <div class="task-create">
+                    <input type="text" id="task-name" placeholder="Enter task name (e.g., Pruning, Harvesting)">
+                    <button class="btn btn-primary" id="create-task">
+                        ➕ Create New Task
+                    </button>
+                </div>
+                <div id="tasks-list"></div>
+            </section>
+        </main>
+
+        <footer>
+            <p>Built for vineyard management • Data stored locally in your browser</p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
