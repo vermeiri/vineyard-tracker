@@ -223,7 +223,7 @@ async function aiDetectRows() {
         return;
     }
     
-    // Save API key
+    // Save API key (Note: localStorage is accessible to any JavaScript on the page)
     localStorage.setItem('openai_api_key', apiKey);
     
     // Show loading status
@@ -268,7 +268,7 @@ Only return the JSON array, no other text.`
                         ]
                     }
                 ],
-                max_tokens: 1000
+                max_tokens: 500
             })
         });
         
@@ -283,9 +283,10 @@ Only return the JSON array, no other text.`
         // Extract JSON from response (handle markdown code blocks)
         let jsonContent = content;
         if (content.includes('```')) {
-            const match = content.match(/```(?:json)?\s*(\[[\s\S]*?\])\s*```/);
+            // Try to extract content between code fences
+            const match = content.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
             if (match) {
-                jsonContent = match[1];
+                jsonContent = match[1].trim();
             }
         }
         

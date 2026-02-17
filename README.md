@@ -29,7 +29,7 @@ This app uses OpenAI's GPT-4 Vision API to automatically analyze vineyard images
 5. Wait 10-30 seconds for analysis
 6. Review detected rows and manually adjust if needed
 
-**Note:** Your API key is stored securely in your browser's local storage and never shared with anyone except OpenAI.
+**Security Note:** Your API key is stored in your browser's localStorage. While convenient, localStorage is accessible to any JavaScript code running on the page. Only use this application on trusted devices and networks. Consider using a restricted API key with spending limits.
 
 ## Setup
 
